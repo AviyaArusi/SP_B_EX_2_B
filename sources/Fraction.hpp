@@ -21,11 +21,13 @@ namespace ariel
         Fraction(int, int);
         Fraction(float);
 
+        bool valid_is(istream&) const;
+
         //Get & Set
-        int get_numerator() const;
-        int get_denominator() const;
-        void set_numerator(int);
-        void set_denominator(int);
+        int getNumerator() const;
+        int getDenominator() const;
+        void setNumerator(int);
+        void setDenominator(int);
 
         // Overloaded operators for arithmetic operations
         Fraction operator+(const Fraction&) const;

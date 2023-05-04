@@ -10,22 +10,30 @@ namespace ariel
     {
         if(den == 0)
         {
-            throw invalid_argument("denominator can't be 0 !");
+            throw invalid_argument("denominator can't be 0 !\n");
         }
         int gcd = abs(__gcd(num, den));
         numerator = num / gcd;
         denominator = den / gcd;
+        if (denominator < 0)
+        {
+            numerator *= -1;
+            denominator *= -1;
+        }
     }
-    Fraction::Fraction(float new_float) : numerator(0), denominator(1) //***************************
+    Fraction::Fraction(float new_float) : numerator(static_cast<int>(new_float * 1000)), denominator(1000)
     {
         if(new_float == 0)
         {
-            throw invalid_argument("denominator can't be 0 !");
+            numerator = 0;
+            denominator = 1;
         }
-        int g = new_float*1000;
-//        int gcd = __gcd();
-        int num;
-        int den;
+        else
+        {
+            int gcd = abs(__gcd(numerator, denominator));
+            numerator = numerator / gcd;
+            denominator = denominator / gcd;
+        }
     }
 //    Fraction::Fraction(const Fraction& other) : numerator(other.get_numerator()), denominator(other.denominator) {}
 //    Fraction::Fraction(Fraction&& other) noexcept : numerator(0), denominator(1) {}
@@ -33,14 +41,14 @@ namespace ariel
 //    Fraction &Fraction::operator=(Fraction&& other) noexcept { return *this; }
 
     // Get & Set
-    int Fraction::get_numerator() const { return numerator; }
-    int Fraction::get_denominator() const { return denominator; }
-    void Fraction::set_numerator(int num) { numerator = num; }
-    void Fraction::set_denominator(int den)
+    int Fraction::getNumerator() const { return numerator; }
+    int Fraction::getDenominator() const { return denominator; }
+    void Fraction::setNumerator(int num) { numerator = num; }
+    void Fraction::setDenominator(int den)
     {
         if (den == 0)
         {
-            throw invalid_argument("Denominator can't be zero!");
+            throw invalid_argument("Denominator can't be zero!\n");
         }
         denominator = den;
     }
@@ -69,6 +77,7 @@ namespace ariel
 
     Fraction Fraction::operator/(const Fraction& other) const
     {
+        if(other == 0) { throw runtime_error("Can't divide by zero!\n"); }
         int num = numerator * other.denominator;
         int den = denominator * other.numerator;
         return Fraction(num, den).reduce();
@@ -134,12 +143,16 @@ namespace ariel
     // Overloaded << and >> operators
     ostream& operator<<(ostream& os, const Fraction& fraction)
     {
-        os << " " << fraction.numerator << '/' << fraction.denominator << " ";
+        os << "" << fraction.numerator << '/' << fraction.denominator << "";
         return os;
     }
 
     istream& operator>>(istream& is, Fraction& fraction)
     {
+//        if (!valid_is(is&))
+//        {
+//            throw invalid_argument("Invalid input stream!\n");
+//        }
         is >> fraction.numerator >> fraction.denominator;
         return is;
     }
@@ -245,7 +258,7 @@ namespace ariel
     bool operator>=(const float& value, const Fraction& fraction) { return !(value < fraction); }
 
     bool operator<=(const Fraction& fraction, const float& value) { return !(fraction > value); }
-    bool operator<=(const float& value, const Fraction& fraction) { return !(value < fraction); }
+    bool operator<=(const float& value, const Fraction& fraction) { return !(value >fraction); }
 
     // Helper function to reduce the fraction to its lowest terms
     Fraction Fraction::reduce()
@@ -253,8 +266,36 @@ namespace ariel
         int gcd = abs(__gcd(numerator, denominator));
         int num = numerator / gcd;
         int den = denominator / gcd;
+        if (den < 0)
+        {
+            den *= -1;
+            num *= -1;
+        }
         return Fraction(num, den);
     }
+
+    bool Fraction::valid_is(istream& is) const
+    {
+        string is_s;
+        getline(is, is_s);
+        size_t i = 0;
+        int num_counter = 0; // Count how many
+        int minus_counter = 0;
+        int slash_counter = 0;
+        int other_counter = 0;
+        while(is_s[i] != '\0')
+        {
+            if(is_s[i] == '/') { slash_counter++; }
+            else if( (is_s[i] >= '0') && (is_s[i] <= '9') ) { num_counter++; }
+            else if(is_s[i] == '-') { minus_counter++; }
+            else { other_counter++; }
+            i++;
+            printf("%c\n", is_s[i]);
+        }
+        if( (num_counter < 2) || (minus_counter > 2) || (slash_counter != 1) || (other_counter != 0) ) {return false;}
+        return true;
+    }
+
 
 
 }
