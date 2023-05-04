@@ -1,5 +1,7 @@
 #include "Fraction.hpp"
 
+// Bdika!
+
 namespace ariel
 {
     // Constructors
