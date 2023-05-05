@@ -6,7 +6,8 @@
 #include <limits>
 
 
-using namespace std;
+//using namespace std;
+
 namespace ariel
 {
 
@@ -18,18 +19,18 @@ namespace ariel
         void reduce();
 
         int overFlow(int, int, char) const;
-        static const int max_int = numeric_limits<int>::max();
-        static const int min_int = numeric_limits<int>::min();
+        static const int max_int = std::numeric_limits<int>::max();
+        static const int min_int = std::numeric_limits<int>::min();
 
 
 
     public:
         // Constructors
-        Fraction();
-        Fraction(int, int);
+//        Fraction();
+        Fraction(int num = 0, int den = 1);
         Fraction(float);
 
-        bool valid_is(istream&) const;
+        bool valid_is(std::istream&) const;
 
         //Get & Set
         int getNumerator() const;

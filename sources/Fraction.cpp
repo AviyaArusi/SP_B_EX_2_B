@@ -1,19 +1,19 @@
 #include "Fraction.hpp"
 
-
+using namespace std;
 namespace ariel
 {
     // Constructors
-    Fraction::Fraction() : numerator(0), denominator(1) {}
-    Fraction::Fraction(int num, int den)// : numerator(num), denominator(den)
+//    Fraction::Fraction() : numerator(0), denominator(1) {}
+    Fraction::Fraction(int num, int den) : numerator(num), denominator(den)
     {
         if(den == 0)
         {
 //            throw runtime_error("Can't divide by zero!\n");
             throw invalid_argument("denominator can't be 0 !\n");
         }
-        numerator = num;
-        denominator = den;
+//        numerator = num;
+//        denominator = den;
         reduce();
     }
     Fraction::Fraction(float new_float) : numerator(static_cast<int>(new_float * 1000)), denominator(1000)
