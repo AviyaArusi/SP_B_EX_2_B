@@ -2,6 +2,9 @@
 #define FRACTION_HPP
 
 #include <iostream>
+//***************
+#include <limits>
+
 
 using namespace std;
 namespace ariel
@@ -12,7 +15,12 @@ namespace ariel
     private:
         int numerator;
         int denominator;
-        Fraction reduce();
+        void reduce();
+
+        int overFlow(int, int, char) const;
+        static const int max_int = numeric_limits<int>::max();
+        static const int min_int = numeric_limits<int>::min();
+
 
 
     public:

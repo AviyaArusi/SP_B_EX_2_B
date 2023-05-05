@@ -1,38 +1,31 @@
 #include "Fraction.hpp"
 
-// Bdika!
 
 namespace ariel
 {
     // Constructors
     Fraction::Fraction() : numerator(0), denominator(1) {}
-    Fraction::Fraction(int num, int den) //: numerator(num), denominator(den)
+    Fraction::Fraction(int num, int den)// : numerator(num), denominator(den)
     {
         if(den == 0)
         {
+//            throw runtime_error("Can't divide by zero!\n");
             throw invalid_argument("denominator can't be 0 !\n");
         }
-        int gcd = abs(__gcd(num, den));
-        numerator = num / gcd;
-        denominator = den / gcd;
-        if (denominator < 0)
-        {
-            numerator *= -1;
-            denominator *= -1;
-        }
+        numerator = num;
+        denominator = den;
+        reduce();
     }
     Fraction::Fraction(float new_float) : numerator(static_cast<int>(new_float * 1000)), denominator(1000)
     {
         if(new_float == 0)
         {
-            numerator = 0;
-            denominator = 1;
+//            numerator = 0;
+//            denominator = 1;
         }
         else
         {
-            int gcd = abs(__gcd(numerator, denominator));
-            numerator = numerator / gcd;
-            denominator = denominator / gcd;
+            reduce();
         }
     }
 //    Fraction::Fraction(const Fraction& other) : numerator(other.get_numerator()), denominator(other.denominator) {}
@@ -48,7 +41,8 @@ namespace ariel
     {
         if (den == 0)
         {
-            throw invalid_argument("Denominator can't be zero!\n");
+            throw runtime_error("Denominator can't be zero!\n");
+//            throw invalid_argument("Denominator can't be zero!\n");
         }
         denominator = den;
     }
@@ -56,31 +50,37 @@ namespace ariel
     // Overloaded operators for arithmetic operations
     Fraction Fraction::operator+(const Fraction& other) const
     {
+        // M version!
+//        int lcm = abs(denominator * other.getDenominator() / __gcd(denominator,other.getDenominator()));
+//        int num1 = numerator * (lcm / denominator);
+//        int num2 = other.getDenominator() * (lcm / other.getDenominator());
+//        return Fraction(overFlow(num1, num2, '+'), lcm);
+//         My version!
         int num = numerator * other.denominator + other.numerator * denominator;
         int den = denominator * other.denominator;
-        return Fraction(num, den).reduce();
+        return Fraction(num, den);
     }
 
     Fraction Fraction::operator-(const Fraction& other) const
     {
         int num = numerator * other.denominator - other.numerator * denominator;
         int den = denominator * other.denominator;
-        return Fraction(num, den).reduce();
+        return Fraction(num, den);
     }
 
     Fraction Fraction::operator*(const Fraction& other) const
     {
         int num = numerator * other.numerator;
         int den = denominator * other.denominator;
-        return Fraction(num, den).reduce();
+        return Fraction(num, den);
     }
 
     Fraction Fraction::operator/(const Fraction& other) const
     {
-        if(other == 0) { throw runtime_error("Can't divide by zero!\n"); }
+        if(other.getNumerator() == 0) { throw runtime_error("Can't divide by zero!\n"); }
         int num = numerator * other.denominator;
         int den = denominator * other.numerator;
-        return Fraction(num, den).reduce();
+        return Fraction(num, den);
     }
 
     // Overloaded comparison operators
@@ -154,6 +154,25 @@ namespace ariel
 //            throw invalid_argument("Invalid input stream!\n");
 //        }
         is >> fraction.numerator >> fraction.denominator;
+        if (is.fail())
+        {
+            throw runtime_error("Invalid input stream!\n");
+        }
+
+        if (fraction.denominator == 0)
+        {
+            throw runtime_error("Denominator can't be zero!\n");
+        }
+        // Make friend function reduce()
+        int gcd = abs(__gcd(fraction.getNumerator(), fraction.getDenominator()));
+        fraction.setNumerator(fraction.getNumerator() / gcd);
+        fraction.setDenominator(fraction.getDenominator() / gcd);
+
+        if (fraction.getDenominator() < 0)
+        {
+            fraction.setDenominator(fraction.getDenominator()*-1);
+            fraction.setNumerator(fraction.getNumerator()*-1);
+        }
         return is;
     }
 
@@ -163,16 +182,16 @@ namespace ariel
         // Convert float value to a fraction
         Fraction f(value);
         // Add the fractions
-        return fraction + f;
+        return (fraction + f);
     }
-    Fraction operator+(const float& value, const Fraction& fraction) { return fraction+value; }
+    Fraction operator+(const float& value, const Fraction& fraction) { return (fraction+value); }
 
     Fraction operator-(const Fraction& fraction, const float& value)
     {
         // Convert float value to a fraction
         Fraction f(value);
         // Add the fractions
-        return fraction - f;
+        return (fraction - f);
     }
     Fraction operator-(const float& value, const Fraction& fraction)
     {
@@ -187,23 +206,25 @@ namespace ariel
         // Convert float value to a fraction
         Fraction f(value);
         // Add the fractions
-        return fraction * f;
+        return (fraction * f);
     }
-    Fraction operator*(const float& value, const Fraction& fraction){ return fraction*value; }
+    Fraction operator*(const float& value, const Fraction& fraction){ return (fraction*value); }
 
     Fraction operator/(const Fraction& fraction, const float& value)
     {
+        if(value == 0) { throw runtime_error("Can't divide by zero!\n"); }
+
         // Convert float value to a fraction
         Fraction f(value);
         // Add the fractions
-        return fraction/f;
+        return (fraction/f);
     }
     Fraction operator/(const float& value, const Fraction& fraction)
     {
         // Convert float value to a fraction
         Fraction f(value);
         // Add the fractions
-        return f/fraction;
+        return (f/fraction);
     }
 
     bool operator==(const Fraction& fraction, const float& value)
@@ -220,23 +241,23 @@ namespace ariel
         // Convert float value to a fraction
         Fraction f(value);
         // Add the fractions
-        return fraction != f;
+        return (fraction != f);
     }
-    bool operator!=(const float& value, const Fraction& fraction) { return fraction != value; }
+    bool operator!=(const float& value, const Fraction& fraction) { return (fraction != value); }
 
     bool operator>(const Fraction& fraction, const float& value)
     {
         // Convert float value to a fraction
         Fraction f(value);
         // Add the fractions
-        return fraction > f;
+        return (fraction > f);
     }
     bool operator>(const float& value, const Fraction& fraction)
     {
         // Convert float value to a fraction
         Fraction f(value);
         // Add the fractions
-        return f > fraction;
+        return (f > fraction);
     }
 
     bool operator<(const Fraction& fraction, const float& value)
@@ -244,14 +265,14 @@ namespace ariel
         // Convert float value to a fraction
         Fraction f(value);
         // Add the fractions
-        return fraction < f;
+        return (fraction < f);
     }
     bool operator<(const float& value, const Fraction& fraction)
     {
         // Convert float value to a fraction
         Fraction f(value);
         // Add the fractions
-        return f < fraction;
+        return (f < fraction);
     }
 
     bool operator>=(const Fraction& fraction, const float& value) { return !(fraction < value); }
@@ -261,264 +282,53 @@ namespace ariel
     bool operator<=(const float& value, const Fraction& fraction) { return !(value >fraction); }
 
     // Helper function to reduce the fraction to its lowest terms
-    Fraction Fraction::reduce()
+    void Fraction::reduce()
     {
         int gcd = abs(__gcd(numerator, denominator));
-        int num = numerator / gcd;
-        int den = denominator / gcd;
-        if (den < 0)
+        numerator = numerator / gcd;
+        denominator = denominator / gcd;
+        if (denominator < 0)
         {
-            den *= -1;
-            num *= -1;
+            denominator *= -1;
+            numerator *= -1;
         }
-        return Fraction(num, den);
     }
 
-    bool Fraction::valid_is(istream& is) const
+    int Fraction::overFlow(int num1, int num2, char opertor) const
     {
-        string is_s;
-        getline(is, is_s);
-        size_t i = 0;
-        int num_counter = 0; // Count how many
-        int minus_counter = 0;
-        int slash_counter = 0;
-        int other_counter = 0;
-        while(is_s[i] != '\0')
+        int den = 0;
+        switch (opertor)
         {
-            if(is_s[i] == '/') { slash_counter++; }
-            else if( (is_s[i] >= '0') && (is_s[i] <= '9') ) { num_counter++; }
-            else if(is_s[i] == '-') { minus_counter++; }
-            else { other_counter++; }
-            i++;
-            printf("%c\n", is_s[i]);
+            case '+':
+                if ((num2 > 0 && num1 > (max_int - num2)) || (num2 < 0 && num1 < (min_int - num2)))
+                {
+                    throw overflow_error("Addition overflow");
+                }
+
+                den = (num1 + num2);
+                break;
+            case '-':
+                if ((num2 < 0 && num1 > max_int + num2) || (num2 > 0 && num1 < min_int + num2))
+                {
+                    throw overflow_error("Subtraction overflow");
+                }
+
+                den = (num1 - num2);
+                break;
+            case '*':
+                if ((num2 > 0 && num1 > max_int / num2) || (num2 < 0 && num1 < max_int / num2))
+                {
+                    throw overflow_error("Multiplication overflow");
+                }
+
+                den = (num1 * num2);
+                break;
         }
-        if( (num_counter < 2) || (minus_counter > 2) || (slash_counter != 1) || (other_counter != 0) ) {return false;}
-        return true;
+
+        return den;
     }
+
 
 
 
 }
-
-//#######################################################################################################################
-
-//
-//#include "Fraction.hpp"
-//#include <iostream>
-//#include <numeric> // for std::gcd
-//
-//namespace ariel
-//{
-//    // Constructors
-//    Fraction::Fraction() : numerator(0), denominator(1) {}
-//
-//    Fraction::Fraction(int num, int den) : numerator(num), denominator(den)
-//    {
-//        if(den == 0)
-//        {
-//            throw invalid_argument("denominator can't be 0 !");
-//        }
-//    }
-//
-////    Fraction::Fraction(double frac)
-////    {
-////        int sign = (x < 0) ? -1 : 1;
-////        x = abs(x);
-////        int whole = static_cast<int>(x);
-////        double fractional = x - whole;
-////
-////        int powerOf10 = pow(10, 6); // 6 decimal places
-////
-////        int num = whole * powerOf10 + round(fractional * powerOf10);
-////        int div = gcd(num, powerOf10);
-////
-////        numerator = sign * (num / div);
-////        denominator = powerOf10 / div;
-////    }
-//
-//
-////    Fraction::Fraction(const Fraction& copy) : numerator(copy.numerator), denominator(copy.denominator) {}
-//
-//    // Destructor
-////    Fraction::~Fraction(){}
-//
-//    // Overloaded operators for arithmetic operations
-//    Fraction Fraction::operator+(const Fraction& other) const
-//    {
-//        int num = numerator * other.denominator + other.numerator * denominator;
-//        int den = denominator * other.denominator;
-//        return Fraction(num, den).reduce();
-//    }
-//
-//    Fraction Fraction::operator-(const Fraction& other) const
-//    {
-//        int num = numerator * other.denominator - other.numerator * denominator;
-//        int den = denominator * other.denominator;
-//        return Fraction(num, den).reduce();
-//    }
-//
-//    Fraction Fraction::operator*(const Fraction& other) const
-//    {
-//        int num = numerator * other.numerator;
-//        int den = denominator * other.denominator;
-//        return Fraction(num, den).reduce();
-//    }
-//
-//    Fraction Fraction::operator/(const Fraction& other) const
-//    {
-//        int num = numerator * other.denominator;
-//        int den = denominator * other.numerator;
-//        return Fraction(num, den).reduce();
-//    }
-//
-//    // Overloaded comparison operators
-//    bool Fraction::operator==(const Fraction& other) const
-//    {
-//        return numerator == other.numerator && denominator == other.denominator;
-//    }
-//
-//    bool Fraction::operator!=(const Fraction& other) const
-//    {
-//        return !(*this == other);
-//    }
-//
-//    bool Fraction::operator>(const Fraction& other) const
-//    {
-//        return (numerator * other.denominator) > (other.numerator * denominator);
-//    }
-//
-//    bool Fraction::operator>(const double& other) const
-//    {
-//        return (numerator * other) > (1 * denominator);
-//    }
-//
-//    bool Fraction::operator<(const Fraction& other) const
-//    {
-//        return (numerator * other.denominator) < (other.numerator * denominator);
-//    }
-//
-//    bool Fraction::operator>=(const Fraction& other) const
-//    {
-//        return !(*this < other);
-//    }
-//
-//    bool Fraction::operator<=(const Fraction& other) const
-//    {
-//        return !(*this > other);
-//    }
-//
-//    // Overloaded ++ and -- operators
-//    Fraction& Fraction::operator++()
-//    {
-//        numerator += denominator;
-//        return *this;
-//    }
-//
-//    Fraction Fraction::operator++(int)
-//    {
-//        Fraction temp = *this;
-//        numerator += denominator;
-//        return temp;
-//    }
-//
-//    Fraction& Fraction::operator--()
-//    {
-//        numerator -= denominator;
-//        return *this;
-//    }
-//
-//    Fraction Fraction::operator--(int)
-//    {
-//        Fraction temp = *this;
-//        numerator -= denominator;
-//        return temp;
-//    }
-//
-//    // Overloaded << and >> operators
-//    ostream& operator<<(ostream& os, const Fraction& fraction)
-//    {
-//        os << " " << fraction.numerator << '/' << fraction.denominator << " ";
-//        return os;
-//    }
-//
-//    istream& operator>>(istream& is, Fraction& fraction)
-//    {
-//        is >> fraction.numerator >> fraction.denominator;
-//        return is;
-//    }
-//
-//    // Helper function to reduce the fraction to its lowest terms
-//    Fraction Fraction::reduce()
-//    {
-//        int gcd = abs(std::gcd(numerator, denominator));
-//        int num = numerator / gcd;
-//        int den = denominator / gcd;
-//        return Fraction(num, den);
-//    }
-//
-//    // Overloaded operators for arithmetic operations with float
-//
-////    Fraction &Fraction::operator=(const Fraction& fraction)
-////    {
-////        numerator = fraction.numerator;
-////        denominator = fraction.denominator;
-////        return *this;
-////    }
-//
-//    Fraction operator+(const Fraction& fraction, double value)
-//    {
-//        int num = static_cast<int>(value * fraction.denominator) + fraction.numerator;
-//        int den = fraction.denominator;
-//        return Fraction(num, den).reduce();
-//    }
-//
-//    Fraction operator+(double value, const Fraction& fraction)
-//    {
-//        int num = static_cast<int>(value * fraction.denominator) + fraction.numerator;
-//        int den = fraction.denominator;
-//        return Fraction(num, den).reduce();
-//    }
-//
-//    Fraction operator-(const Fraction& fraction, double value)
-//    {
-//        int num = fraction.numerator - static_cast<int>(value * fraction.denominator);
-//        int den = fraction.denominator;
-//        return Fraction(num, den).reduce();
-//    }
-//
-//    Fraction operator-(double value, const Fraction& fraction)
-//    {
-//        int num = fraction.numerator - static_cast<int>(value * fraction.denominator);
-//        int den = fraction.denominator;
-//        return Fraction(num, den).reduce();
-//    }
-//
-//    Fraction operator*(const Fraction& fraction, double value)
-//    {
-//        int num = static_cast<int>(value * fraction.numerator);
-//        int den = fraction.denominator;
-//        return Fraction(num, den).reduce();
-//    }
-//
-//    Fraction operator*(double value, const Fraction& fraction)
-//    {
-//        int num = static_cast<int>(value * fraction.numerator);
-//        int den = fraction.denominator;
-//        return Fraction(num, den).reduce();
-//    }
-//
-//    Fraction operator/(const Fraction& fraction, double value)
-//    {
-//        int num = fraction.numerator;
-//        int den = static_cast<int>(fraction.denominator * value);
-//        return Fraction(num, den).reduce();
-//    }
-//
-//    Fraction operator/(double value, const Fraction& fraction)
-//    {
-//        int num = fraction.numerator;
-//        int den = static_cast<int>(fraction.denominator * value);
-//        return Fraction(num, den).reduce();
-//    }
-//
-//}
