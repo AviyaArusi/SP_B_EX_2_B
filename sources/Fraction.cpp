@@ -3,32 +3,23 @@
 using namespace std;
 namespace ariel
 {
-    // Constructors
+    // Constructors:
+
+    
     Fraction::Fraction() : numerator(0), denominator(1) {}
 
     Fraction::Fraction(int num, int den) : numerator(num), denominator(den)
     {
         if (den == 0)
         {
-            //            throw runtime_error("Can't divide by zero!\n");
             throw invalid_argument("denominator can't be 0 !\n");
         }
         reduce();
     }
-    Fraction::Fraction(float new_float) : numerator(static_cast<int>(new_float * 1000)), denominator(1000)
-    {
-        if (new_float == 0)
-        {
-            //            numerator = 0;
-            //            denominator = 1;
-        }
-        else
-        {
-            reduce();
-        }
-    }
+    Fraction::Fraction(float new_float) : numerator(static_cast<int>(new_float * 1000)), denominator(1000) { reduce(); }
 
     Fraction::Fraction(const Fraction &other) : numerator(other.getNumerator()), denominator(other.getDenominator()) {}
+
     Fraction::Fraction(Fraction &&other) noexcept : numerator(other.getNumerator()), denominator(other.getDenominator()) {}
 
     Fraction &Fraction::operator=(const Fraction &other)
@@ -37,6 +28,7 @@ namespace ariel
         denominator = other.getDenominator();
         return (*this);
     }
+
     Fraction &Fraction::operator=(Fraction &&other) noexcept
     {
         numerator = other.getNumerator();
@@ -53,15 +45,39 @@ namespace ariel
         if (den == 0)
         {
             throw runtime_error("Denominator can't be zero!\n");
-            //            throw invalid_argument("Denominator can't be zero!\n");
         }
         denominator = den;
+    }
+
+    // Overloaded ++ and -- operators
+    Fraction &Fraction::operator++()
+    {
+        numerator += denominator;
+        return *this;
+    }
+    const Fraction Fraction::operator++(int)
+    {
+        Fraction temp = (*this);
+        numerator += denominator;
+        return temp;
+    }
+
+    Fraction &Fraction::operator--()
+    {
+        numerator -= denominator;
+        return *this;
+    }
+
+    const Fraction Fraction::operator--(int)
+    {
+        Fraction temp = (*this);
+        numerator -= denominator;
+        return temp;
     }
 
     // Overloaded operators for arithmetic operations
     const Fraction operator+(const Fraction &frac1, const Fraction &frac2)
     {
-        //         My version!
         int lcm = abs((frac1.getDenominator() * frac2.getDenominator()) / __gcd(frac1.getDenominator() , frac2.getDenominator()));
         int num1 = frac1.getNumerator() * (lcm / frac1.getDenominator());
         int num2 = frac2.getNumerator() * (lcm / frac2.getDenominator());
@@ -133,32 +149,7 @@ namespace ariel
         return !(frac1 > frac2);
     }
 
-    // Overloaded ++ and -- operators
-    Fraction &Fraction::operator++()
-    {
-        numerator += denominator;
-        return *this;
-    }
-    const Fraction Fraction::operator++(int)
-    {
-        Fraction temp = (*this);
-        numerator += denominator;
-        return temp;
-    }
-
-    Fraction &Fraction::operator--()
-    {
-        numerator -= denominator;
-        return *this;
-    }
-
-    const Fraction Fraction::operator--(int)
-    {
-        Fraction temp = (*this);
-        numerator -= denominator;
-        return temp;
-    }
-
+    
     // Overloaded << and >> operators
     ostream &operator<<(ostream &os, const Fraction &fraction)
     {
@@ -168,10 +159,6 @@ namespace ariel
 
     istream &operator>>(istream &is, Fraction &fraction)
     {
-        //        if (!valid_is(is&))
-        //        {
-        //            throw invalid_argument("Invalid input stream!\n");
-        //        }
         is >> fraction.numerator >> fraction.denominator;
         if (is.fail())
         {
@@ -182,16 +169,8 @@ namespace ariel
         {
             throw runtime_error("Denominator can't be zero!\n");
         }
-        // Make friend function reduce()
-        int gcd = abs(__gcd(fraction.getNumerator(), fraction.getDenominator()));
-        fraction.setNumerator(fraction.getNumerator() / gcd);
-        fraction.setDenominator(fraction.getDenominator() / gcd);
 
-        if (fraction.getDenominator() < 0)
-        {
-            fraction.setDenominator(fraction.getDenominator() * -1);
-            fraction.setNumerator(fraction.getNumerator() * -1);
-        }
+        fraction.reduce();
         return is;
     }
 
@@ -199,8 +178,8 @@ namespace ariel
     void Fraction::reduce()
     {
         int gcd = abs(__gcd(numerator, denominator));
-        numerator = numerator / gcd;
-        denominator = denominator / gcd;
+        numerator = (numerator / gcd);
+        denominator = (denominator / gcd);
         if (denominator < 0)
         {
             denominator *= -1;

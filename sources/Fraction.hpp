@@ -40,6 +40,12 @@ namespace ariel
         void setNumerator(int);
         void setDenominator(int);
 
+        // Overloaded ++ and -- operators
+        Fraction& operator++();
+        const Fraction operator++(int);
+        Fraction& operator--();
+        const Fraction operator--(int);
+
         // Overloaded operators for arithmetic operations
         const friend Fraction operator+(const Fraction&,const Fraction&);
         const friend Fraction operator-(const Fraction&,const Fraction&);
@@ -54,15 +60,10 @@ namespace ariel
         friend bool operator>=(const Fraction&,const Fraction&);
         friend bool operator<=(const Fraction&,const Fraction&);
 
-        // Overloaded ++ and -- operators
-        Fraction& operator++();
-        const Fraction operator++(int);
-        Fraction& operator--();
-        const Fraction operator--(int);
-
         // Overloaded << and >> operators
         friend std::ostream& operator<<(std::ostream&, const Fraction& );
         friend std::istream& operator>>(std::istream&, Fraction&);
+
     };
     
     void overFlow(int, int, char);
