@@ -159,7 +159,8 @@ namespace ariel
 
     istream &operator>>(istream &is, Fraction &fraction)
     {
-        is >> fraction.numerator >> fraction.denominator;
+        int num, den;
+        is >> num >> den;
         if (is.fail())
         {
             throw runtime_error("Invalid input stream!\n");
@@ -169,7 +170,9 @@ namespace ariel
         {
             throw runtime_error("Denominator can't be zero!\n");
         }
-
+        
+        fraction.setNumerator(num);
+        fraction.setDenominator(den);
         fraction.reduce();
         return is;
     }
