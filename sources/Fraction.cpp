@@ -39,7 +39,11 @@ namespace ariel
     // Get & Set
     int Fraction::getNumerator() const { return numerator; }
     int Fraction::getDenominator() const { return denominator; }
-    void Fraction::setNumerator(int num) { numerator = num; }
+    void Fraction::setNumerator(int num) 
+    { 
+        numerator = num;
+        reduce();
+    }
     void Fraction::setDenominator(int den)
     {
         if (den == 0)
@@ -47,6 +51,7 @@ namespace ariel
             throw runtime_error("Denominator can't be zero!\n");
         }
         denominator = den;
+        reduce();
     }
 
     // Overloaded ++ and -- operators
@@ -170,10 +175,17 @@ namespace ariel
         {
             throw runtime_error("Denominator can't be zero!\n");
         }
-        
+        // Make sure the fraction is reduce;
+        int gcd = abs(__gcd(num, den));
+        num = (num / gcd);
+        den = (den / gcd);
+        if (den < 0)
+        {
+            den *= -1;
+            num *= -1;
+        }
         fraction.setNumerator(num);
         fraction.setDenominator(den);
-        fraction.reduce();
         return is;
     }
 
