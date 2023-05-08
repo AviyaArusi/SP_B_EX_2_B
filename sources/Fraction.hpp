@@ -1,12 +1,9 @@
-#ifndef FRACTION_HPP
-#define FRACTION_HPP
+#pragma once
 
 #include <iostream>
 //***************
 #include <limits>
 
-
-//using namespace std;
 
 namespace ariel
 {
@@ -18,17 +15,22 @@ namespace ariel
         int denominator;
         void reduce();
 
-        int overFlow(int, int, char) const;
-        static const int max_int = std::numeric_limits<int>::max();
-        static const int min_int = std::numeric_limits<int>::min();
-
-
 
     public:
         // Constructors
-//        Fraction();
-        Fraction(int num = 0, int den = 1);
+       Fraction();
+        // Fraction(int num = 0, int den = 1);
+        Fraction(int num, int den);
         Fraction(float);
+
+        Fraction(const Fraction& other);
+        Fraction(Fraction&& other) noexcept;
+        
+        //destructor
+        ~Fraction() = default;
+
+        Fraction& operator=(const Fraction& other);
+        Fraction& operator=(Fraction&& other) noexcept;
 
         bool valid_is(std::istream&) const;
 
@@ -39,18 +41,18 @@ namespace ariel
         void setDenominator(int);
 
         // Overloaded operators for arithmetic operations
-        Fraction operator+(const Fraction&) const;
-        Fraction operator-(const Fraction&) const;
-        Fraction operator*(const Fraction&) const;
-        Fraction operator/(const Fraction&) const;
+        const friend Fraction operator+(const Fraction&,const Fraction&);
+        const friend Fraction operator-(const Fraction&,const Fraction&);
+        const friend Fraction operator*(const Fraction&,const Fraction&);
+        const friend Fraction operator/(const Fraction&,const Fraction&);
 
         // Overloaded comparison operators
-        bool operator==(const Fraction&) const;
-        bool operator!=(const Fraction&) const;
-        bool operator>(const Fraction&) const;
-        bool operator<(const Fraction&) const;
-        bool operator>=(const Fraction&) const;
-        bool operator<=(const Fraction&) const;
+        friend bool operator==(const Fraction&,const Fraction&);
+        friend bool operator!=(const Fraction&,const Fraction&);
+        friend bool operator>(const Fraction&,const Fraction&);
+        friend bool operator<(const Fraction&,const Fraction&);
+        friend bool operator>=(const Fraction&,const Fraction&);
+        friend bool operator<=(const Fraction&,const Fraction&);
 
         // Overloaded ++ and -- operators
         Fraction& operator++();
@@ -60,41 +62,10 @@ namespace ariel
 
         // Overloaded << and >> operators
         friend std::ostream& operator<<(std::ostream&, const Fraction& );
-        friend std::istream& operator>>(std::istream&, Fraction& );
-
-        // Friend functions
-        friend Fraction operator+(const Fraction& fraction, const float& value);
-        friend Fraction operator+(const float&, const Fraction&);
-
-        friend Fraction operator-(const Fraction& fraction, const float& value);
-        friend Fraction operator-(const float&, const Fraction&);
-
-        friend Fraction operator*(const Fraction& fraction, const float& value);
-        friend Fraction operator*(const float&, const Fraction&);
-
-        friend Fraction operator/(const Fraction& fraction, const float& value);
-        friend Fraction operator/(const float&, const Fraction&);
-
-        friend bool operator==(const Fraction&, const float&);
-        friend bool operator==(const float&, const Fraction&);
-
-        friend bool operator!=(const Fraction&, const float&);
-        friend bool operator!=(const float&, const Fraction&);
-
-        friend bool operator>(const Fraction&, const float&);
-        friend bool operator>(const float&, const Fraction&);
-
-        friend bool operator<(const Fraction&, const float&);
-        friend bool operator<(const float&, const Fraction&);
-
-        friend bool operator>=(const Fraction&, const float&);
-        friend bool operator>=(const float&, const Fraction&);
-
-        friend bool operator<=(const Fraction&, const float&);
-        friend bool operator<=(const float&, const Fraction&);
-
+        friend std::istream& operator>>(std::istream&, Fraction&);
     };
-}
+    
+    void overFlow(int, int, char);
 
-#endif // FRACTION_HPP
+}
 
