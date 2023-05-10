@@ -753,3 +753,4 @@ TEST_CASE("Fraction with largest possible numerator and/or denominator and overf
     CHECK_NOTHROW(f5 + Fraction{1, 1});
     CHECK_NOTHROW(f7 - Fraction{1, 1});
 }
+

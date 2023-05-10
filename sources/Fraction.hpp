@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-//***************
 #include <limits>
 
 
@@ -18,8 +17,7 @@ namespace ariel
 
     public:
         // Constructors
-       Fraction();
-        // Fraction(int num = 0, int den = 1);
+        Fraction();
         Fraction(int num, int den);
         Fraction(float);
 
@@ -32,14 +30,10 @@ namespace ariel
         Fraction& operator=(const Fraction& other);
         Fraction& operator=(Fraction&& other) noexcept;
 
-        bool valid_is(std::istream&) const;
-
         //Get & Set
         int getNumerator() const;
         int getDenominator() const;
-        void setNumerator(int);
-        void setDenominator(int);
-
+        
         // Overloaded ++ and -- operators
         Fraction& operator++();
         const Fraction operator++(int);
@@ -66,7 +60,7 @@ namespace ariel
 
     };
     
-    void overFlow(int, int, char);
-
+    void overFlow(long long, long long, char);
+    int lcm1(long long, long long);
 }
 

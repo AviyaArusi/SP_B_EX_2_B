@@ -29,20 +29,20 @@ namespace ariel
     /**
      * Copy constructor, creates a new fraction that is a copy of another fraction
     */
-    Fraction::Fraction(const Fraction &other) : numerator(other.getNumerator()), denominator(other.getDenominator()) {}
+    Fraction::Fraction(const Fraction &other) : numerator(other.numerator), denominator(other.denominator) {}
 
     /**
      * Move constructor, creates a new fraction by moving data from another fraction
     */
-    Fraction::Fraction(Fraction &&other) noexcept : numerator(other.getNumerator()), denominator(other.getDenominator()) {}
+    Fraction::Fraction(Fraction &&other) noexcept : numerator(other.numerator), denominator(other.denominator) {}
 
     /**
      * Copy assignment operator, assigns a new value to an existing fraction
     */
     Fraction &Fraction::operator=(const Fraction &other)
     {
-        numerator = other.getNumerator();
-        denominator = other.getDenominator();
+        numerator = other.numerator;
+        denominator = other.denominator;
         return (*this);
     }
 
@@ -51,28 +51,14 @@ namespace ariel
     */
     Fraction &Fraction::operator=(Fraction &&other) noexcept
     {
-        numerator = other.getNumerator();
-        denominator = other.getDenominator();
+        numerator = other.numerator;
+        denominator = other.denominator;
         return (*this);
     }
 
     // Get & Set
     int Fraction::getNumerator() const { return numerator; }
     int Fraction::getDenominator() const { return denominator; }
-    void Fraction::setNumerator(int num)
-    {
-        numerator = num;
-        reduce(); // Reduce the fraction to its lowest terms
-    }
-    void Fraction::setDenominator(int den)
-    {
-        if (den == 0)
-        {
-            throw runtime_error("Denominator can't be zero!\n");
-        }
-        denominator = den;
-        reduce(); // Reduce the fraction to its lowest terms
-    }
 
     // Overloaded ++ and -- operators
     Fraction &Fraction::operator++()
@@ -90,7 +76,7 @@ namespace ariel
     Fraction &Fraction::operator--()
     {
         numerator -= denominator;
-        return *this;
+        return (*this);
     }
 
     const Fraction Fraction::operator--(int)
@@ -104,9 +90,9 @@ namespace ariel
     // the functions can handle with casting case. 
     const Fraction operator+(const Fraction &frac1, const Fraction &frac2)
     {
-        int lcm = abs((frac1.getDenominator() * frac2.getDenominator()) / __gcd(frac1.getDenominator(), frac2.getDenominator()));
-        int num1 = frac1.getNumerator() * (lcm / frac1.getDenominator());
-        int num2 = frac2.getNumerator() * (lcm / frac2.getDenominator());
+        long long lcm = lcm1(frac1.denominator, frac2.denominator);
+        long long num1 = frac1.numerator * (lcm / frac1.denominator);
+        long long num2 = frac2.numerator * (lcm / frac2.denominator);
         overFlow(num1, num2, '+');
         int num = num1 + num2;
         return Fraction(num, lcm);
@@ -114,40 +100,35 @@ namespace ariel
 
     const Fraction operator-(const Fraction &frac1, const Fraction &frac2)
     {
-        int lcm = abs((frac1.getDenominator() * frac2.getDenominator()) / __gcd(frac1.getDenominator(), frac2.getDenominator()));
-        int num1 = frac1.getNumerator() * (lcm / frac1.getDenominator());
-        int num2 = frac2.getNumerator() * (lcm / frac2.getDenominator());
-        overFlow(num1, num2, '-');
-        int num = num1 - num2;
-        return Fraction(num, lcm);
+        return frac1 + (-1*frac2);
     }
 
     const Fraction operator*(const Fraction &frac1, const Fraction &frac2)
     {
-        overFlow(frac1.getNumerator(), frac2.getNumerator(), '*');
-        overFlow(frac1.getDenominator(), frac2.getDenominator(), '*');
-        int num = frac1.getNumerator() * frac2.getNumerator();
-        int den = frac1.getDenominator() * frac2.getDenominator();
+        overFlow(frac1.numerator, frac2.numerator, '*');
+        overFlow(frac1.denominator, frac2.denominator, '*');
+        int num = frac1.numerator * frac2.numerator;
+        int den = frac1.denominator * frac2.denominator;
         return Fraction(num, den);
     }
 
     const Fraction operator/(const Fraction &frac1, const Fraction &frac2)
     {
-        if (frac2.getNumerator() == 0)
+        if (frac2.numerator == 0)
         {
             throw runtime_error("Can't divide by zero!\n");
         }
-        overFlow(frac1.getNumerator(), frac2.getDenominator(), '*');
-        overFlow(frac1.getDenominator(), frac2.getNumerator(), '*');
-        int num = frac1.getNumerator() * frac2.getDenominator();
-        int den = frac1.getDenominator() * frac2.getNumerator();
+        overFlow(frac1.numerator, frac2.denominator, '*');
+        overFlow(frac1.denominator, frac2.numerator, '*');
+        int num = frac1.numerator * frac2.denominator;
+        int den = frac1.denominator * frac2.numerator;
         return Fraction(num, den);
     }
 
     // Overloaded comparison operators
     bool operator==(const Fraction &frac1, const Fraction &frac2)
     {
-        return (frac1.getNumerator() == frac2.getNumerator()) && (frac1.getDenominator() == frac2.getDenominator());
+        return (frac1.numerator == frac2.numerator) && (frac1.denominator == frac2.denominator);
     }
 
     bool operator!=(const Fraction &frac1, const Fraction &frac2)
@@ -157,12 +138,12 @@ namespace ariel
 
     bool operator>(const Fraction &frac1, const Fraction &frac2)
     {
-        return (frac1.getNumerator() * frac2.getDenominator()) > (frac2.getNumerator() * frac1.getDenominator());
+        return (frac1.numerator * frac2.denominator) > (frac2.numerator * frac1.denominator);
     }
 
     bool operator<(const Fraction &frac1, const Fraction &frac2)
     {
-        return (frac1.getNumerator() * frac2.getDenominator()) < (frac2.getNumerator() * frac1.getDenominator());
+        return (frac1.numerator * frac2.denominator) < (frac2.numerator * frac1.denominator);
     }
 
     bool operator>=(const Fraction &frac1, const Fraction &frac2)
@@ -191,21 +172,14 @@ namespace ariel
             throw runtime_error("Invalid input stream!\n");
         }
 
-        if (fraction.denominator == 0)
+        if (den == 0)
         {
             throw runtime_error("Denominator can't be zero!\n");
         }
         // Make sure the fraction is reduce;
-        int gcd = abs(__gcd(num, den));
-        num = (num / gcd);
-        den = (den / gcd);
-        if (den < 0)
-        {
-            den *= -1;
-            num *= -1;
-        }
-        fraction.setNumerator(num);
-        fraction.setDenominator(den);
+        fraction.numerator = num;
+        fraction.denominator = den;
+        fraction.reduce();
         return is;
     }
 
@@ -222,88 +196,42 @@ namespace ariel
         }
     }
 
-    void overFlow2(int num1, int num2, char opertor)
+    void overFlow(long long num1, long long num2, char opertor)
     {
-        int max_int = numeric_limits<int>::max();
-        int min_int = numeric_limits<int>::min();
-        int den = 0;
-        switch (opertor)
-        {
-        case '+':
-            if ((num2 > 0 && num1 > (max_int - num2)) || (num2 < 0 && num1 < (min_int - num2)))
-            {
-                throw overflow_error("Addition overflow");
-            }
-            break;
-        case '-':
-            if ((num2 < 0 && num1 > max_int + num2) || (num2 > 0 && num1 < min_int + num2))
-            {
-                throw overflow_error("Subtraction overflow");
-            }
-            break;
-        case '*':
-            if ((num2 > 0 && num1 > max_int / num2) || (num2 < 0 && num1 < max_int / num2))
-            {
-                throw overflow_error("Multiplication overflow");
-            }
-            break;
-        }
-    }
-
-
-     void overFlow(int num1, int num2, char opertor)
-    {
-        int max_int = numeric_limits<int>::max();
-        int min_int = numeric_limits<int>::min();
-        int den = 0;
+        long long max_int = numeric_limits<int>::max();
+        long long min_int = numeric_limits<int>::min();
         bool err = false;
         switch (opertor)
         {
         case '+':
-            if (num2 > 0)
+            if ( (num1+num2 > max_int) || (num1+num2 < min_int) )// Check only where num1 in positive.
             {
-                if(num1 > (max_int-num2) ){err = true;}
-            }
-            else if(num2 < 0)
-            {
-                if(num1 < (min_int-num2) ){err = true;}
-            }
-            if (err)
-            {
-                throw overflow_error("Addition overflow");
+                err = true;
             }
             break;
 
         case '-':
-            if (num2 < 0)
+            if ( (num1-num2 > max_int) || (num1-num2 < min_int) )// Check only where num1 in positive.
             {
-                if(num1 > (max_int+num2) ){err = true;}
-            }
-            else if (num2 > 0)
-            {
-                if(num1 < (min_int+num2) ){err = true;}
-            }
-            if (err)
-            {
-                throw overflow_error("Addition overflow");
+                err = true;
             }
             break;
 
         case '*':
-              if (num2 > 0)
+              if ((num1*num2 > max_int) || (num1*num2 < min_int))
             {
-                if(num1 > (max_int/num2) ){err = true;}
-            }
-            else if (num2 < 0)
-            {
-                if(num1 < (max_int/num2)){err= true;}
-            }
-            if (err)
-            {
-                throw overflow_error("Addition overflow");
+                err = true;
             }
             break;
         }
+
+        if (err){ throw overflow_error("Addition overflow"); }
+    }
+
+    int lcm1(long long num1, long long num2)
+    {
+        long long lcm = abs((num1 * num2) / __gcd(num1, num2));
+        return lcm;
     }
 
 
